@@ -1,3 +1,5 @@
+Please completely replace python/main.py with this code:
+
 import asyncio
 import logging
 import os
@@ -199,9 +201,9 @@ async def cb_ask_ai(callback: CallbackQuery):
 async def text_handler(message: Message):
     from mistralai import Mistral
     client = Mistral(api_key=os.getenv("MISTRAL_API_KEY"))
-
+    
     thinking = await message.answer("⏳ Думаю...")
-
+    
     try:
         response = client.chat.complete(
             model="mistral-small-latest",
@@ -215,12 +217,12 @@ async def text_handler(message: Message):
         answer = response.choices[0].message.content
     except Exception as e:
         answer = "Что-то пошло не так 😔\nНапишите напрямую: @ZinaidaChu или @Averkieva_Helen"
-
+    
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="✍️ Написать Зинаиде", url="https://t.me/ZinaidaChu")],
         [InlineKeyboardButton(text="🏠 В главное меню", callback_data="menu")],
     ])
-
+    
     await thinking.delete()
     await message.answer(answer, reply_markup=kb)
 
