@@ -8,6 +8,14 @@ from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKe
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.storage.memory import MemoryStorage
 
+from course_data import (
+    COURSE_DESCRIPTION,
+    MODULES_TEXT,
+    TARIFFS_TEXT,
+    WHAT_YOU_GET_TEXT,
+    FAQ_LIST
+)
+
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
@@ -197,29 +205,48 @@ async def cb_ask_ai(callback: CallbackQuery):
 
 @dp.message(F.text)
 async def text_handler(message: Message):
-    from mistralai import Mistral
-
     thinking = await message.answer("⏳ Думаю...")
 
     try:
-        api_key = os.getenv("MISTRAL_API_KEY")
-        logging.info(f"MISTRAL_API_KEY loaded: {'yes' if api_key else 'NO - key is missing!'}")
+        from mistralai import Mistral
+        client = Mistral(api_key=os.getenv("MISTRAL_API_KEY"))
 
-        client = Mistral(api_key=api_key)
-        response = await client.chat.complete_async(
+        system_prompt = f"""Ты тёплый и дружелюбный помощник курса «ИИ в HR. Практика» Зинаиды Чумаковой.
+Отвечай только на русском языке. Отвечай кратко и по делу.
+Для записи всегда отправляй к @ZinaidaChu или @Averkieva_Helen.
+
+ИНФОРМАЦИЯ О КУРСЕ:
+{COURSE_DESCRIPTION}
+
+ПРОГРАММА МОДУЛЕЙ:
+{MODULES_TEXT}
+
+ТАРИФЫ:
+{TARIFFS_TEXT}
+
+ЧТО ПОЛУЧАТ УЧАСТНИКИ:
+{WHAT_YOU_GET_TEXT}
+"""
+
+        response = client.chat.complete(
             model="mistral-small-latest",
             messages=[
-                {"role": "system", "content": "Ты помощник курса «ИИ в HR. Практика» Зинаиды Чумаковой. HRD с 20-летним опытом. Старт 14 апреля 2026. Тарифы: Один модуль 8800р, Базовый 25500р, Стандарт 39600р, VIP 66000р — ранняя цена до 25 марта. Отвечай тепло и кратко на русском. Для записи отправляй к @ZinaidaChu"},
-                {"role": "user", "content": message.text},
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": message.text}
             ],
-            max_tokens=500,
+            max_tokens=800,
             temperature=0.7,
         )
         answer = response.choices[0].message.content
-        logging.info("Mistral responded successfully")
+        print(f"Mistral OK: {answer[:50]}")
+
     except Exception as e:
-        logging.error(f"Mistral error: {e}", exc_info=True)
-        answer = "Что-то пошло не так 😔\nНапишите напрямую: @ZinaidaChu или @Averkieva_Helen"
+        print(f"Mistral ERROR: {type(e).__name__}: {e}")
+        answer = (
+            "Что-то пошло не так 😔\n\n"
+            "Напишите напрямую — ответим быстро!\n"
+            "👉 @ZinaidaChu или @Averkieva_Helen"
+        )
 
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="✍️ Написать Зинаиде", url="https://t.me/ZinaidaChu")],

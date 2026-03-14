@@ -1,0 +1,70 @@
+Please fix the text_handler in python/main.py to:
+
+1. Import course data from course_data.py at the top of main.py
+2. Include full course information in the Mistral system prompt
+3. Fix the Mistral API call for version 2.0+ with proper error logging
+
+Replace the text_handler and imports with this code:
+
+from course_data import (
+    COURSE_DESCRIPTION,
+    MODULES_TEXT, 
+    TARIFFS_TEXT,
+    WHAT_YOU_GET_TEXT,
+    FAQ_LIST
+)
+
+@dp.message(F.text)
+async def text_handler(message: Message):
+    thinking = await message.answer("⏳ Думаю...")
+    
+    try:
+        from mistralai import Mistral
+        client = Mistral(api_key=os.getenv("MISTRAL_API_KEY"))
+        
+        system_prompt = f"""Ты тёплый и дружелюбный помощник курса «ИИ в HR. Практика» Зинаиды Чумаковой.
+Отвечай только на русском языке. Отвечай кратко и по делу.
+Для записи всегда отправляй к @ZinaidaChu или @Averkieva_Helen.
+
+ИНФОРМАЦИЯ О КУРСЕ:
+{COURSE_DESCRIPTION}
+
+ПРОГРАММА МОДУЛЕЙ:
+{MODULES_TEXT}
+
+ТАРИФЫ:
+{TARIFFS_TEXT}
+
+ЧТО ПОЛУЧАТ УЧАСТНИКИ:
+{WHAT_YOU_GET_TEXT}
+"""
+        
+        response = client.chat.complete(
+            model="mistral-small-latest",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": message.text}
+            ],
+            max_tokens=800,
+            temperature=0.7,
+        )
+        answer = response.choices[0].message.content
+        print(f"Mistral OK: {answer[:50]}")
+        
+    except Exception as e:
+        print(f"Mistral ERROR: {type(e).__name__}: {e}")
+        answer = (
+            "Что-то пошло не так 😔\n\n"
+            "Напишите напрямую — ответим быстро!\n"
+            "👉 @ZinaidaChu или @Averkieva_Helen"
+        )
+    
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="✍️ Написать Зинаиде", url="https://t.me/ZinaidaChu")],
+        [InlineKeyboardButton(text="🏠 В главное меню", callback_data="menu")],
+    ])
+    
+    await thinking.delete()
+    await message.answer(answer, reply_markup=kb)
+
+Then restart the workflow and show me the console output when a message is sent.
