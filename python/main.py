@@ -197,23 +197,35 @@ async def cb_ask_ai(callback: CallbackQuery):
 
 @dp.message(F.text)
 async def text_handler(message: Message):
-    from mistralai import Mistral
-    client = Mistral(api_key=os.getenv("MISTRAL_API_KEY"))
+    import asyncio
+    from mistralai.client import MistralClient
+    from mistralai.models.chat_completion import ChatMessage
 
     thinking = await message.answer("⏳ Думаю...")
 
     try:
-        response = client.chat.complete(
-            model="mistral-small-latest",
-            messages=[
-                {"role": "system", "content": "Ты помощник курса «ИИ в HR. Практика» Зинаиды Чумаковой. HRD с 20-летним опытом. Старт 14 апреля 2026. Тарифы: Один модуль 8800р, Базовый 25500р, Стандарт 39600р, VIP 66000р — ранняя цена до 25 марта. Отвечай тепло и кратко на русском. Для записи отправляй к @ZinaidaChu"},
-                {"role": "user", "content": message.text}
-            ],
-            max_tokens=500,
-            temperature=0.7,
-        )
+        api_key = os.getenv("MISTRAL_API_KEY")
+        logging.info(f"MISTRAL_API_KEY loaded: {'yes' if api_key else 'NO - key is missing!'}")
+
+        client = MistralClient(api_key=api_key)
+
+        def call_mistral():
+            return client.chat(
+                model="mistral-small-latest",
+                messages=[
+                    ChatMessage(role="system", content="Ты помощник курса «ИИ в HR. Практика» Зинаиды Чумаковой. HRD с 20-летним опытом. Старт 14 апреля 2026. Тарифы: Один модуль 8800р, Базовый 25500р, Стандарт 39600р, VIP 66000р — ранняя цена до 25 марта. Отвечай тепло и кратко на русском. Для записи отправляй к @ZinaidaChu"),
+                    ChatMessage(role="user", content=message.text),
+                ],
+                max_tokens=500,
+                temperature=0.7,
+            )
+
+        loop = asyncio.get_event_loop()
+        response = await loop.run_in_executor(None, call_mistral)
         answer = response.choices[0].message.content
+        logging.info("Mistral responded successfully")
     except Exception as e:
+        logging.error(f"Mistral error: {e}", exc_info=True)
         answer = "Что-то пошло не так 😔\nНапишите напрямую: @ZinaidaChu или @Averkieva_Helen"
 
     kb = InlineKeyboardMarkup(inline_keyboard=[
