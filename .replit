@@ -30,12 +30,12 @@ args = "Run Python"
 name = "Run Python"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "python python/main.py"
-
 [workflows.workflow.metadata]
 outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd python && python main.py"
 
 [agent]
 stack = "PNPM_WORKSPACE"
