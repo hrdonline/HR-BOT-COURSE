@@ -1,4 +1,4 @@
-aiogram==3.4.1
-mistralai==0.4.2
+aiogram>=3.26.0
+mistralai>=2.0.0
 aiosqlite
 python-dotenv
