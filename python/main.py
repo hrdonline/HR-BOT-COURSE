@@ -208,7 +208,7 @@ async def text_handler(message: Message):
     thinking = await message.answer("⏳ Думаю...")
 
     try:
-        from mistralai import Mistral
+        from mistralai.client import Mistral
         client = Mistral(api_key=os.getenv("MISTRAL_API_KEY"))
 
         system_prompt = f"""Ты тёплый и дружелюбный помощник курса «ИИ в HR. Практика» Зинаиды Чумаковой.
