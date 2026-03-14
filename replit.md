@@ -48,6 +48,14 @@ Every package extends `tsconfig.base.json` which sets `composite: true`. The roo
 - `pnpm run build` — runs `typecheck` first, then recursively runs `build` in all packages that define it
 - `pnpm run typecheck` — runs `tsc --build --emitDeclarationOnly` using project references
 
+## Python Project
+
+A simple Python 3.11 project lives in the `python/` directory.
+
+- Entry: `python/main.py` — the main script
+- Dependencies: `python/requirements.txt` — add pip packages here
+- Run: Use the "Run Python" workflow or `python python/main.py`
+
 ## Packages
 
 ### `artifacts/api-server` (`@workspace/api-server`)
