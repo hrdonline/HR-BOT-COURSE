@@ -1,3 +1,6 @@
+import sys
+print("=== БОТА ЗАПУСКАЕМ ===", flush=True)
+print(f"Python: {sys.version}", flush=True)
 import asyncio
 import logging
 import os
