@@ -8,4 +8,5 @@ dependencies = [
     "aiosqlite>=0.22.1",
     "mistralai>=2.0.0",
     "python-dotenv>=1.2.2",
+    "flask>=3.0.0",
 ]

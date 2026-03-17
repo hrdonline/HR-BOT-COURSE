@@ -346,5 +346,6 @@ async def main():
     print("🤖 Бот запущен!")
     await dp.start_polling(bot)
 
-if __name__ == "__main__":
-    asyncio.run(main())
+from keep_alive import keep_alive
+keep_alive()
+asyncio.run(main())
