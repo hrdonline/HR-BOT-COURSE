@@ -4,7 +4,6 @@ print(f"Python: {sys.version}", flush=True)
 import asyncio
 import logging
 import os
-from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, F, Router
 from aiogram.types import (
     Message, CallbackQuery,
@@ -14,7 +13,6 @@ from aiogram.types import (
 from aiogram.filters import CommandStart
 from aiogram.fsm.storage.memory import MemoryStorage
 
-load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -254,7 +252,7 @@ async def send_invoice(callback: CallbackQuery, bot: Bot):
         title=f"Курс «ИИ в HR. Практика» — {tariff['name']}",
         description=(
             f"Автор: Зинаида Чумакова\n"
-            f"Старт: 14 апреля 2026\n"
+            f"Старт: 14 апреля 2025\n"
             f"Формат: Онлайн\n"
             f"Тариф: {tariff['name']}"
         ),
